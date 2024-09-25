@@ -61,7 +61,7 @@ module SemanticLogger
             end
           end
 
-          describe "when exception ocurrs" do
+          describe "when exception occurs" do
             it "has tag exception" do
               set_exception
               assert_match(/tag="exception"/, formatter.call(log, nil))
