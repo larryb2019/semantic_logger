@@ -34,8 +34,6 @@ gem "nokogiri"
 gem "splunk-sdk-ruby"
 # [optional] Statsd metrics
 gem "statsd-ruby"
-# [optional] legacy Sentry appender
-gem "sentry-raven"
 # [optional] new Sentry appender
 gem "sentry-ruby"
 # [optional] Syslog appender when communicating with a remote syslogd over TCP
@@ -43,3 +41,4 @@ gem "syslog"
 gem "syslog_protocol"
 
 gem "rubocop", "~> 1.28.1", require: false
+gem "simplecov", require: false, group: :test

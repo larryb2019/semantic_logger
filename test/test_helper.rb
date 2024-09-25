@@ -3,7 +3,11 @@ $LOAD_PATH.unshift File.dirname(__FILE__) + "/../lib"
 
 # Configure Rails Environment
 ENV["RAILS_ENV"] = "test"
-
+# > mongosh
+# > db.getMongo()
+# mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.1
+ENV["MONGO_HOST"] = "127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.1"
+require "simplecov"
 require "minitest/autorun"
 require "minitest/reporters"
 require "minitest/stub_any_instance"
@@ -17,6 +21,7 @@ require_relative "in_memory_batch_appender"
 require_relative "in_memory_metrics_appender"
 require_relative "in_memory_appender_helper"
 require "amazing_print"
+SimpleCov.start
 
 # Add Semantic Logger helpers for Minitest
 Minitest::Test.include SemanticLogger::Test::Minitest
@@ -44,7 +49,7 @@ reporters = [
   Minitest::Reporters::ProgressReporter.new,
   SemanticLogger::Reporters::Minitest.new
 ]
-Minitest::Reporters.use!(reporters)
+Minitest::Reporters.use!(reporters) unless ENV["RM_INFO"]
 
 def add_mocks_to_load_path
   $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "mocks")

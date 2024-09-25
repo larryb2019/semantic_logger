@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 # Unit Test for SemanticLogger::Logger
 class LoggerTest < Minitest::Test
-  describe SemanticLogger::Logger do
+  describe "SemanticLogger::Logger" do
     let(:logger) { SemanticLogger::Test::CaptureLogEvents.new }
 
     # Complex filters
@@ -150,6 +150,73 @@ class LoggerTest < Minitest::Test
       it "yields self to be compatible with rails tagged logger" do
         logger.tagged("12345", "DJHSFK") do |yielded_logger|
           assert_equal logger.object_id, yielded_logger.object_id
+        end
+      end
+
+      describe "log_internal" do
+        let(:msg) {"Hello World"}
+        let(:metric) { "MyMetric" }
+        let(:log) { logger.events.first }
+
+        describe "message present" do
+          it "sets metric and payload" do
+            logger.info(message: msg, metric: metric, criteria: {one: 1})
+
+            assert log
+            assert_equal msg, log.message
+            assert_equal metric, log.metric
+            assert_equal({criteria: {one: 1}}, log.payload)
+            assert_nil log.exception
+          end
+
+          it "also sets metric and payload" do
+            logger.info(msg, metric: metric, criteria: {one: 1})
+
+            assert log
+            assert_equal msg, log.message
+            assert_equal metric, log.metric
+            assert_equal({criteria: {one: 1}}, log.payload)
+            assert_nil log.exception
+          end
+        end
+
+        describe "payload present" do
+          describe "as string" do
+            let(:payload) {"From RocketJob"}
+            it "concatenates message and payload" do
+              logger.info(msg, payload, metric: "MyMetric", criteria: {one: 1})
+
+              assert log
+              assert_equal "#{msg} -- #{payload}", log.message
+              assert_nil log.metric
+              assert_nil log.payload
+              assert_equal({metric: "MyMetric", criteria: {one: 1}}, log.exception)
+            end
+          end
+
+          describe "as Hash" do
+            it "sets metric and payload" do
+              logger.info(msg, metric: "MyMetric", criteria: {one: 1})
+
+              assert_equal msg, log.message
+              assert_equal metric, log.metric
+              assert_equal({criteria: {one: 1}}, log.payload)
+              assert_nil log.exception
+            end
+
+            it "sets metric and payload" do
+              logger.info(msg, metric: metric, payload: {criteria: {one: 1}})
+
+              assert_equal msg, log.message
+              assert_equal metric, log.metric
+              assert_equal({criteria: {one: 1}}, log.payload)
+              assert_nil log.exception
+            end
+          end
+        end
+
+        describe "exception present" do
+
         end
       end
     end
